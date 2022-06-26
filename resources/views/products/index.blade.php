@@ -8,14 +8,18 @@
 
 
     <div class="card">
-        <form action="" method="get" class="card-header">
+        <form action="{{ route('product.index') }}"  class="card-header">
             <div class="form-row justify-content-between">
                 <div class="col-md-2">
-                    <input type="text" name="title" placeholder="Product Title" class="form-control">
+                    <input type="text" name="title" placeholder="Product Title" value="{{ $title }}" class="form-control">
                 </div>
                 <div class="col-md-2">
                     <select name="variant" id="" class="form-control">
-
+                        @foreach ($productVariants as $item)
+                           
+                            <option value="{{ $item->variant }}">{{ $item->variant }}</option>
+                           
+                        @endforeach
                     </select>
                 </div>
 
@@ -32,7 +36,7 @@
                     <input type="date" name="date" placeholder="Date" class="form-control">
                 </div>
                 <div class="col-md-1">
-                    <button type="submit" class="btn btn-primary float-right"><i class="fa fa-search"></i></button>
+                    <button type="submit" name="search"  class="btn btn-primary float-right"><i class="fa fa-search"></i></button>
                 </div>
             </div>
         </form>
@@ -51,32 +55,41 @@
                     </thead>
 
                     <tbody>
-
+                    @forelse ($products as $i=>$product)
                     <tr>
-                        <td>1</td>
-                        <td>T-Shirt <br> Created at : 25-Aug-2020</td>
-                        <td>Quality product in low cost</td>
+                        <td>{{ $i+1 }}</td>
+                        <td>{{ $product->title }} <br> Created at : {{ date('d-M-Y',strtotime($product->created_at)) }}</td>
+                        <td>{{ $product->description }}</td>
                         <td>
-                            <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
+                            <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant{{ $i }}">
 
                                 <dt class="col-sm-3 pb-0">
-                                    SM/ Red/ V-Nick
+                                    @foreach ($product->productVariants as $item)
+                                        {{ $item->variant }}/
+                                    @endforeach
+                                    {{-- SM/ Red/ V-Nick --}}
                                 </dt>
                                 <dd class="col-sm-9">
                                     <dl class="row mb-0">
-                                        <dt class="col-sm-4 pb-0">Price : {{ number_format(200,2) }}</dt>
-                                        <dd class="col-sm-8 pb-0">InStock : {{ number_format(50,2) }}</dd>
+                                        @foreach ($product->productVariantPrices as $vprice)
+                                        <dt class="col-sm-4 pb-0">Price : {{ number_format($vprice->price,2) }}</dt>
+                                        <dd class="col-sm-8 pb-0">InStock : {{ number_format($vprice->stock,2) }}</dd>
+                                        @endforeach
                                     </dl>
                                 </dd>
                             </dl>
-                            <button onclick="$('#variant').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more</button>
+                            <button onclick="$('#variant{{ $i }}').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more</button>
                         </td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="{{ route('product.edit', 1) }}" class="btn btn-success">Edit</a>
+                                <a href="{{ route('product.edit', $product) }}" class="btn btn-success">Edit</a>
                             </div>
                         </td>
                     </tr>
+                    @empty
+                        <tr><td colspan="5">No Data available in this table</td></tr>
+                    @endforelse
+                   
 
                     </tbody>
 
@@ -88,10 +101,12 @@
         <div class="card-footer">
             <div class="row justify-content-between">
                 <div class="col-md-6">
-                    <p>Showing 1 to 10 out of 100</p>
+                    @if(!blank($products))
+                    <p>Showing 1 to 2 out of {{ $totalProducts }}</p>
+                    @endif
                 </div>
-                <div class="col-md-2">
-
+                <div class="col-md-6">
+                    {{ $products->links() }}
                 </div>
             </div>
         </div>

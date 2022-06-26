@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,4 +27,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('product', 'ProductController');
     Route::resource('blog', 'BlogController');
     Route::resource('blog-category', 'BlogCategoryController');
+
+    Route::get('product-photo/delete/{id}',[ProductController::class,'productPhotoDelete'])->name('product-photo.delete');
+    Route::get('product-varian/delete/{id}',[ProductController::class,'productVarianDelete'])->name('product-varian.delete');
+    Route::get('product/search',[ProductController::class,'productSearch'])->name('porduct.search');
 });
